@@ -31,20 +31,31 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+Route::get('/surat-masuk/detail', function () {
+    return redirect()->route('incoming.mail.list');
+});
+Route::get('/surat-keluar/detail', function () {
+    return redirect()->route('incoming.outmail.list');
+});
 Route::controller(SuratMasukController::class)->middleware(['auth', 'verified'])->group(function () {
     Route::get('/surat-masuk', 'index')->name('incoming.mail.list');
     Route::get('/surat-masuk/tambah', 'add')->name('add.mail.list');
     Route::post('/surat-masuk/tambah', 'store')->name('store.mail.list');
-    Route::get('/surat-masuk/detail/{id}', 'detail')->name('detail.mail.list');
+    Route::post('/surat-masuk/upload', 'uploadCsv')->name('store.mail.upload');
+    Route::get('/sample-csv-surat-masuk', 'downloadCsvSample')->name('sample.csv.mail');
+
+    Route::get('/surat-masuk/detail/{id}', 'detail')->name('detail.mail.list')->middleware("signed");
     Route::post('/surat-masuk/detail', 'edit')->name('edit.mail.list');
     Route::delete('/surat-masuk/hapus/{id}', 'delete')->name('delete.mail.list');
 });
 
 Route::controller(SuratKeluarController::class)->middleware(['auth', 'verified'])->group(function () {
     Route::get('/surat-keluar', 'index')->name('incoming.outmail.list');
+    Route::get('/sample-csv-surat-keluar', 'downloadCsvSample')->name('sample.csv.outmail');
     Route::get('/surat-keluar/tambah', 'add')->name('add.outmail.list');
     Route::post('/surat-keluar/tambah', 'store')->name('store.outmail.list');
-    Route::get('/surat-keluar/detail/{id}', 'detail')->name('detail.outmail.list');
+    Route::post('/surat-keluar/upload', 'uploadCsv')->name('store.outmail.upload');
+    Route::get('/surat-keluar/detail/{id}', 'detail')->name('detail.outmail.list')->middleware("signed");
     Route::post('/surat-keluar/detail', 'edit')->name('edit.outmail.list');
     Route::delete('/surat-keluar/hapus/{id}', 'delete')->name('delete.outmail.list');
 });
@@ -59,4 +70,4 @@ Route::controller(UserController::class)->middleware(['auth', 'verified'])->grou
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
