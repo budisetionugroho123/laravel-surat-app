@@ -55,6 +55,7 @@
                                                         <th>Jenis Berkas</th>
                                                         <th>No Berkas</th>
                                                         <th>Nama Unit</th>
+                                                        <th>Bukti Berkas</th>
                                                         <th>Tanggal Masuk</th>
                                                         <th>Tanggal Keluar</th>
                                                     </tr>
@@ -71,9 +72,27 @@
                                                         <td class="">{{$letter->jenis_berkas}}</td>
                                                         <td class="">{{$letter->no_berkas}}</td>
                                                         <td class="">{{$letter->nama_unit}}</td>
+                                                        <td class="">
+                                                            <button type="button" class="btn btn-sm btn-primary text-primary" data-bs-toggle="modal" data-bs-target="#previewModal{{$letter->id}}">
+                                                                Preview
+                                                            </button>
+                                                        </td>
                                                         <td class="">{{empty($letter->tanggal_masuk) ? "-" : $letter->tanggal_masuk}}</td>
                                                         <td class="">{{empty($letter->tanggal_keluar) ? "-" : $letter->tanggal_keluar}}</td>
                                                     </tr>
+                                                    <div class="modal fade" id="previewModal{{$letter->id}}" tabindex="-1" aria-labelledby="previewModalLabel{{$letter->id}}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-xl">
+                                                        <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="previewModalLabel{{$letter->id}}">Preview PDF</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <iframe src="{{ asset('storage/' . $letter->file) }}" width="100%" height="600px"></iframe>
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                    </div>
                                                     @endforeach
                                                 </tbody>
                                             </table>

@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="p-5 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-                <form action="{{route('edit.outmail.list')}}" method="POST">
+                <form action="{{route('edit.outmail.list')}}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id" value="{{$letter->id}}">
                     <div class="mb-3 row">
@@ -63,12 +63,39 @@
                             @enderror
                         </div>
                     </div>
+                    <div class="mb-3 row">
+                        <label for="file" class="col-sm-2 col-form-label col-form-label-sm">Bukti Berkas Keluar</label>
+                        <div class="col-sm-10">
+                            <input type="file" name="file" class="rounded form-control form-control-sm" id="file" value="{{old('file')}}" placeholder="masukkan tanggal keluar">
+                            <span><small>
+                                    <button type="button" class="btn btn-sm btn-primary text-primary" data-bs-toggle="modal" data-bs-target="#previewModal{{$letter->id}}">
+                                        Preview
+                                    </button>
+                            </small></span>
+                            @error('file')
+                                <small class="text-danger">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
                     <div class="mt-3 mb-3 row justify-content-end">
                             <button type="submit" class="text-white btn bg-secondary col-sm-2">Simpan</button>
                     </div>
 
                 </div>
             </form>
+        </div>
+        <div class="modal fade" id="previewModal{{$letter->id}}" tabindex="-1" aria-labelledby="previewModalLabel{{$letter->id}}" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel{{$letter->id}}">Preview PDF</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <iframe src="{{ asset('storage/' . $letter->file) }}" width="100%" height="600px"></iframe>
+            </div>
+            </div>
+        </div>
         </div>
     </div>
 

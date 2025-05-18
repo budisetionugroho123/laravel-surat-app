@@ -6,6 +6,7 @@ use App\Models\Letters;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class SuratMasukController extends Controller
@@ -31,14 +32,25 @@ class SuratMasukController extends Controller
             'nama_unit' => 'required',
             'no_unit' => 'required',
             'tanggal_masuk' => 'required',
+            'file'=> 'required|file|mimes:pdf|max:2048', // max dalam kilobytes (2048 KB = 2 MB)
         ]);
 
         try {
             $validateData['type'] = 'surat_masuk';
-            $checkData = Letters::where("no_unit", $request->no_unit)->where("type", "surat_masuk")->first();
+            $checkData = Letters::where("no_unit", $request->no_unit)->where("type", "surat_masuk")->where("nama_unit", $request->nama_unit)->where("no_berkas", $request->no_berkas)->first();
             if ($checkData) {
-                return redirect()->route('incoming.mail.list')->with('toast_error', "Dokumen masuk dengan no unit yang sama udah terdaftar");
+                return redirect()->route('incoming.mail.list')->with('toast_error', "Dokumen dengan no unit/nama unit/no berkas yang sama udah di input");
             }
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $folder = "surat_masuk/{$request->nama_unit}";
+                $file->storeAs("public/{$folder}", $filename);
+
+                $validateData['file'] = "surat_masuk"."/".$request->nama_unit."/". "{$filename}";
+            }
+
+            $validateData['type'] = 'surat_masuk';
             Letters::create($validateData);
             return redirect()->route('incoming.mail.list')->with('toast_success', "Berhasil menyimpan data");
         } catch (\Throwable $th) {
@@ -65,15 +77,36 @@ class SuratMasukController extends Controller
             'nama_unit' => 'required',
             'no_unit' => 'required',
             'tanggal_masuk' => 'required',
+            'file' => 'nullable|file|mimes:pdf|max:2048',
         ]);
 
         try {
+            $letter = Letters::findOrFail($request->id);
             $validateData['type'] = 'surat_masuk';
-            $letter = Letters::find($request->id);
+            $checkData = Letters::where("no_unit", $request->no_unit)->where("type", "surat_masuk")->where("nama_unit", $request->nama_unit)->where("no_berkas", $request->no_berkas)->where("id", "!=" , $request->id)->first();
+            if ($checkData) {
+                return back()->with('toast_error', "Dokumen dengan no unit/nama unit/no berkas yang sama udah di input");
+            }
+            // Jika ada file baru
+            if ($request->hasFile('file')) {
+                // Hapus file lama jika ada
+                if ($letter->file && Storage::disk('public')->exists($letter->file)) {
+                    Storage::disk('public')->delete($letter->file);
+                }
+
+                // Upload file baru
+                $file = $request->file('file');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $folder = "surat_masuk/{$request->nama_unit}";
+                $file->storeAs("public/{$folder}", $filename);
+
+                // Simpan path file baru
+                $validateData['file'] = "{$folder}/{$filename}";
+            }
+
             $letter->update($validateData);
             return redirect()->route('incoming.mail.list')->with('toast_success', "Berhasil mengubah data");
         } catch (\Throwable $th) {
-            //throw $th;
             return back()->with('toast_error', $th->getMessage());
         }
     }

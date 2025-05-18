@@ -9,7 +9,7 @@
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="p-5 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
                 <a href="{{route('add.mail.list')}}" class="text-white btn btn-sm bg-secondary"><i class="bi bi-plus"></i>Tambah Dokumen masuk</a>
-                <a  data-bs-toggle="modal" data-bs-target="#uploadDocumentMasukModal" class="text-white btn btn-sm bg-success"><i class="bi bi-file-earmark-excel"></i>Upload Dokumen Masuk</a>
+                {{-- <a  data-bs-toggle="modal" data-bs-target="#uploadDocumentMasukModal" class="text-white btn btn-sm bg-success"><i class="bi bi-file-earmark-excel"></i>Upload Dokumen Masuk</a> --}}
 
                 <table id="tableIncomingMail" class="table w-100 table-secondary table-bordered " >
                     <thead class="thead-dark">
@@ -19,6 +19,7 @@
                             <th class="text-center">No Berkas</th>
                             <th class="text-center">Nama Unit</th>
                             <th class="text-center">No Unit</th>
+                            <th class="text-center">Bukti Berkas</th>
                             <th class="text-center">Tanggal Masuk</th>
                             <th class="text-center">Action</th>
                         </tr>
@@ -34,17 +35,36 @@
                                 <td class="text-center">{{$letter->no_berkas}}</td>
                                 <td class="text-center">{{$letter->nama_unit}}</td>
                                 <td class="text-center">{{$letter->no_unit}}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-primary text-primary" data-bs-toggle="modal" data-bs-target="#previewModal{{$letter->id}}">
+                                        Preview
+                                    </button>
+                                </td>
                                 <td class="text-center">{{$letter->tanggal_masuk}}</td>
                                 <td class="text-center">
                                     <a href="{{URL::signedRoute('detail.mail.list', $letter->id)}}" class="p-1 text-white rounded bi bi-eye bg-warning "></a>
                                     <a href="{{route('delete.mail.list', $letter->id)}}" data-confirm-delete="true" class="p-1 text-white rounded bi bi-trash bg-danger"></a>
                                 </td>
                             </tr>
+                            <div class="modal fade" id="previewModal{{$letter->id}}" tabindex="-1" aria-labelledby="previewModalLabel{{$letter->id}}" aria-hidden="true">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="previewModalLabel{{$letter->id}}">Preview PDF</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <iframe src="{{ asset('storage/' . $letter->file) }}" width="100%" height="600px"></iframe>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
                         @endforeach
                     </tbody>
                 </table>
             </div>
         </div>
+
         <div class="modal fade" id="uploadDocumentMasukModal" tabindex="-1" aria-labelledby="uploadDocumentMasukModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">

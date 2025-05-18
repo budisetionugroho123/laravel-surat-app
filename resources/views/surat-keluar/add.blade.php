@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="p-5 overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-                <form action="{{route('store.outmail.list')}}" method="POST">
+                <form action="{{route('store.outmail.list')}}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3 row">
                         <label for="jenis_berkas" class="col-sm-2 col-form-label col-form-label-sm">Jenis Berkas</label>
@@ -58,6 +58,15 @@
                         <div class="col-sm-10">
                             <input type="date" name="tanggal_keluar" class="rounded form-control form-control-sm" id="tanggal_keluar" value="{{old('tanggal_keluar')}}" placeholder="masukkan tanggal keluar">
                             @error('tanggal_keluar')
+                                <small class="text-danger">{{$message}}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="file" class="col-sm-2 col-form-label col-form-label-sm">Bukti Berkas Keluar</label>
+                        <div class="col-sm-10">
+                            <input type="file" name="file" class="rounded form-control form-control-sm" id="file" value="{{old('file')}}" placeholder="masukkan tanggal keluar">
+                            @error('file')
                                 <small class="text-danger">{{$message}}</small>
                             @enderror
                         </div>
